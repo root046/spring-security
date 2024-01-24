@@ -1,4 +1,4 @@
-package com.bader88.springsecurity.resources;
+package com.bader88.springsecurity.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-public class TodoResource {
+public class TodoController {
     private Logger logger = LoggerFactory.getLogger(getClass());
     private static List<Todo> getTodos() {
     return List.of(new Todo("bader", "Learn Spring Security"),
