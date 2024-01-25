@@ -4,6 +4,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -71,5 +75,31 @@ public class BasicAuthSecurityConfiguration {
     //if you want local Configuration to specific Controller, put this annotation of the top of controller you want to use.
     //@CrossOrigin(origins = "http://localhost:3000")
 
+    enum Role {
+        USER,
+        ADMIN
+    }
+    @Bean
+    public UserDetailsService userDetailsService() {
 
+        /** this will store multiple Credentials details in memory
+         *
+         * The {noop} part in the password means that the password will be stored in the database
+         *             without any encryption. This is useful for testing purposes,
+         *             as it allows you to set a known password for a user without having to encrypt it.
+         *             In a real application, you would want to use a more secure password hashing algorithm.
+         */
+
+        var admin = User.withUsername("root")
+                .password("{noop}0000")
+                .roles(String.valueOf(Role.ADMIN))
+                .build();
+
+        var user = User.withUsername("bader")
+                .password("{noop}0000")
+                .roles(String.valueOf(Role.USER))
+                .build();
+
+        return new InMemoryUserDetailsManager(admin, user);
+    }
 }
