@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -42,4 +44,32 @@ public class BasicAuthSecurityConfiguration {
         // Returns the built security filter chain.
         return http.build();
     }
+
+    /**
+     * Configures Cross-Origin Resource Sharing (CORS) for all requests.
+     * <p>
+     * This allows the client-side code running in the web browser to make cross-origin HTTP requests to the
+     * server, which is required for modern web applications that use AJAX calls.
+     * <p>
+     * By default, all origins are allowed to make cross-origin requests, but this can be restricted to specific
+     * origins by modifying the allowedOrigins property.
+     */
+    //global Configuration to all project
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry
+                        .addMapping("/**")
+                        .allowedMethods("*")
+                        .allowedOrigins("http://localhost:3000");
+            }
+        };
+    }
+
+    //if you want local Configuration to specific Controller, put this annotation of the top of controller you want to use.
+    //@CrossOrigin(origins = "http://localhost:3000")
+
+
 }
