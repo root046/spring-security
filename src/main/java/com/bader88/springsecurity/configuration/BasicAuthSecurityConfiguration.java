@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -101,19 +102,17 @@ public class BasicAuthSecurityConfiguration {
 
         /** this will store multiple Credentials details in database(H2)
          *
-         * The {noop} part in the password means that the password will be stored in the database
-         *             without any encryption. This is useful for testing purposes,
-         *             as it allows you to set a known password for a user without having to encrypt it.
-         *             In a real application, you would want to use a more secure password hashing algorithm.
          */
 
         var admin = User.withUsername("root")
-                .password("{noop}0000")
+                .password("0000")
+                .passwordEncoder(str -> passwordEncoder().encode(str))
                 .roles(String.valueOf(Role.ADMIN))
                 .build();
 
         var user = User.withUsername("bader")
-                .password("{noop}0000")
+                .password("0000")
+                .passwordEncoder(str -> passwordEncoder().encode(str))
                 .roles(String.valueOf(Role.USER))
                 .build();
 
@@ -122,5 +121,14 @@ public class BasicAuthSecurityConfiguration {
         jdbcUserDetailsManager.createUser(user);
 
         return jdbcUserDetailsManager;
+    }
+    /**
+     * Provides a BCryptPasswordEncoder bean for password hashing.
+     *
+     * @return the configured {@link BCryptPasswordEncoder} bean
+     */
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
