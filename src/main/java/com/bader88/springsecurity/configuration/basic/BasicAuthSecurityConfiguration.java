@@ -1,4 +1,4 @@
-package com.bader88.springsecurity.configuration;
+package com.bader88.springsecurity.configuration.basic;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 /**
  * Configures basic authentication for the Spring Security framework.
  */
-@Configuration
+
+//convert to JWT Auth
+//@Configuration
 public class BasicAuthSecurityConfiguration {
 
     /**
