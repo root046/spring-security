@@ -2,15 +2,21 @@ package com.bader88.springsecurity.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.sql.DataSource;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -45,6 +51,10 @@ public class BasicAuthSecurityConfiguration {
         // Lines 13-16: Disables CSRF protection.
         http.csrf(csrf -> csrf.disable());
 
+        // Lines 17: Configures the HTTP headers to set X-Frame-Options to dame origin.
+        // If you encounter an deprecated error, dont worry about it just try run.
+        http.headers().frameOptions().sameOrigin();
+
         // Returns the built security filter chain.
         return http.build();
     }
@@ -75,14 +85,21 @@ public class BasicAuthSecurityConfiguration {
     //if you want local Configuration to specific Controller, put this annotation of the top of controller you want to use.
     //@CrossOrigin(origins = "http://localhost:3000")
 
+    @Bean
+    public DataSource dataSource(){
+        return new EmbeddedDatabaseBuilder()
+                .setType(EmbeddedDatabaseType.H2)
+                .addScript(JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION)
+                .build();
+    }
     enum Role {
         USER,
         ADMIN
     }
     @Bean
-    public UserDetailsService userDetailsService() {
+    public UserDetailsService userDetailsService(DataSource dataSource) {
 
-        /** this will store multiple Credentials details in memory
+        /** this will store multiple Credentials details in database(H2)
          *
          * The {noop} part in the password means that the password will be stored in the database
          *             without any encryption. This is useful for testing purposes,
@@ -100,6 +117,10 @@ public class BasicAuthSecurityConfiguration {
                 .roles(String.valueOf(Role.USER))
                 .build();
 
-        return new InMemoryUserDetailsManager(admin, user);
+        var jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+        jdbcUserDetailsManager.createUser(admin);
+        jdbcUserDetailsManager.createUser(user);
+
+        return jdbcUserDetailsManager;
     }
 }
