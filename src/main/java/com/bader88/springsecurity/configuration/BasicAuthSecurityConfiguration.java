@@ -52,10 +52,11 @@ public class BasicAuthSecurityConfiguration {
         // Lines 13-16: Disables CSRF protection.
         http.csrf(csrf -> csrf.disable());
 
-        // Lines 17: Configures the HTTP headers to set X-Frame-Options to dame origin.
-        // If you encounter an deprecated error, dont worry about it just try run.
-        http.headers().frameOptions().sameOrigin();
-
+        // Lines 17: Configures the HTTP headers to set X-Frame-Options to same origin.
+        http.headers(headers -> headers.frameOptions(
+                        frameOptions -> frameOptions.sameOrigin()
+                )
+        );
         // Returns the built security filter chain.
         return http.build();
     }
@@ -87,16 +88,18 @@ public class BasicAuthSecurityConfiguration {
     //@CrossOrigin(origins = "http://localhost:3000")
 
     @Bean
-    public DataSource dataSource(){
+    public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .setType(EmbeddedDatabaseType.H2)
                 .addScript(JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION)
                 .build();
     }
+
     enum Role {
         USER,
         ADMIN
     }
+
     @Bean
     public UserDetailsService userDetailsService(DataSource dataSource) {
 
@@ -122,6 +125,7 @@ public class BasicAuthSecurityConfiguration {
 
         return jdbcUserDetailsManager;
     }
+
     /**
      * Provides a BCryptPasswordEncoder bean for password hashing.
      *
