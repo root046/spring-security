@@ -38,7 +38,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 /**
  * Configures basic authentication for the Spring Security framework.
  */
-@Configuration
+//Convert to BasicAuth
+//@Configuration
 public class JwtAuthSecurityConfiguration {
 
     /**

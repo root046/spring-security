@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
@@ -25,8 +26,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
  * Configures basic authentication for the Spring Security framework.
  */
 
-//convert to JWT Auth
-//@Configuration
+@Configuration
 public class BasicAuthSecurityConfiguration {
 
     /**
@@ -39,7 +39,12 @@ public class BasicAuthSecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         // Lines 1-4: Configures the security filter chain to require authentication for all requests.
-        http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
+        http.authorizeHttpRequests(auth -> {
+            auth
+                    .requestMatchers("/users").hasRole("USER") // Requires "USER" role for "/users" endpoint
+                    .requestMatchers("/admin/**").hasRole("ADMIN") // Requires "ADMIN" role for "/admin/**" endpoints
+                    .anyRequest().authenticated();// Requires authentication for any other request
+        });
 
         // Lines 5-6: Configures the session management to be stateless.
         http.sessionManagement(
