@@ -115,7 +115,13 @@ public class BasicAuthSecurityConfiguration {
          *
          */
 
-        var admin = User.withUsername("root")
+        var admin = User.withUsername("admin")
+                .password("0000")
+                .passwordEncoder(str -> passwordEncoder().encode(str))
+                .roles(String.valueOf(Role.ADMIN))
+                .build();
+
+        var root = User.withUsername("root")
                 .password("0000")
                 .passwordEncoder(str -> passwordEncoder().encode(str))
                 .roles(String.valueOf(Role.ADMIN))
@@ -129,6 +135,7 @@ public class BasicAuthSecurityConfiguration {
 
         var jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
         jdbcUserDetailsManager.createUser(admin);
+        jdbcUserDetailsManager.createUser(root);
         jdbcUserDetailsManager.createUser(user);
 
         return jdbcUserDetailsManager;
