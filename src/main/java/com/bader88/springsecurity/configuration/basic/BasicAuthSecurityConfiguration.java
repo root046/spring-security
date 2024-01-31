@@ -27,7 +27,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
  */
 
 @Configuration
-@EnableMethodSecurity(jsr250Enabled = true)
+@EnableMethodSecurity(jsr250Enabled = true,securedEnabled = true)
 public class BasicAuthSecurityConfiguration {
 
     /**
