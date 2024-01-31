@@ -27,6 +27,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
  */
 
 @Configuration
+@EnableMethodSecurity
 public class BasicAuthSecurityConfiguration {
 
     /**
